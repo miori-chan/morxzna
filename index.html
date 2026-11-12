@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inarich Store - Dark Gothic Review System</title>
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cinzel (Gothic feel) & Noto Sans Thai -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gothic: {
+                            bg: '#0a0a0a',
+                            card: '#121212',
+                            border: '#262626',
+                            borderHover: '#404040',
+                            text: '#e5e5e5',
+                            subtext: '#a3a3a3',
+                            accent: '#ffffff',
+                            muted: '#525252'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Noto Sans Thai', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(40, 40, 40, 0.3) 0%, transparent 75%),
+                radial-gradient(circle at 50% 100%, rgba(20, 20, 20, 0.5) 0%, transparent 75%);
+            color: #e5e5e5;
+            font-family: 'Noto Sans Thai', sans-serif;
+            min-height: 100vh;
+        }
+        /* Gothic Frame Borders */
+        .gothic-frame {
+            position: relative;
+            background-color: #121212;
+            border: 1px solid #282828;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.9);
+        }
+        .gothic-frame-dashed {
+            border: 1px dashed #404040;
+        }
+        /* Gothic Black Button */
+        .gothic-btn-black {
+            background: linear-gradient(180deg, #1f1f1f 0%, #0d0d0d 100%);
+            border: 1px solid #3d3d3d;
+            color: #e5e5e5;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .gothic-btn-black:hover {
+            background: linear-gradient(180deg, #2d2d2d 0%, #171717 100%);
+            border-color: #737373;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        .gothic-btn-black:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+        }
+        /* Skull / Gothic Float effect */
+        @keyframes gothicFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(1deg); }
+        }
+        .animate-gothic-float {
+            animation: gothicFloat 4s ease-in-out infinite;
+        }
+        /* Gothic Falling Crosses Animation */
+        @keyframes fallAndSway {
+            0% {
+                transform: translateY(-20px) rotate(0deg) translateX(0px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.35;
+            }
+            90% {
+                opacity: 0.35;
+            }
+            100% {
+                transform: translateY(105vh) rotate(360deg) translateX(25px);
+                opacity: 0;
+            }
+        }
+        .falling-cross {
+            position: fixed;
+            top: -30px;
+            color: #737373;
+            pointer-events: none;
+            z-index: 1;
+            user-select: none;
+            animation: fallAndSway linear infinite;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #404040;
+        }
+    </style>
+</head>
+<body class="py-4 px-3 sm:py-6 sm:px-6">
+    <!-- MAIN CONTAINER (Mobile-First Layout: Optimized for small screens) -->
+    <div class="w-full max-w-xl mx-auto space-y-4 sm:space-y-5">
+        <!-- HEADER TOP BAR: Web Title & Admin Access -->
+        <div class="flex items-center justify-between text-[11px] sm:text-xs text-stone-500 font-cinzel tracking-widest px-1">
+            <span>† INARICH STORE †</span>
+            <span>Est. MMXXVI</span>
+        </div>
+        <!-- SECTION 1: Shop Header Card (Mobile Friendly Layout) -->
+        <div class="gothic-frame gothic-frame-dashed rounded-2xl p-3.5 sm:p-5 relative overflow-hidden">
+            <!-- Spider / Gothic Ornaments -->
+            <div class="absolute top-2 left-2 text-stone-700 text-[10px] sm:text-xs">🕷</div>
+            <div class="absolute top-2 right-2 text-stone-700 text-[10px] sm:text-xs">🕸</div>
+            <div class="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3">
+                <div class="flex items-center space-x-3 sm:space-x-4 w-full">
+                    <!-- Gothic Logo Avatar -->
+                    <div class="relative group shrink-0">
+                        <div id="shopLogoContainer" class="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-stone-900 border border-stone-700 flex items-center justify-center shadow-inner relative overflow-hidden animate-gothic-float">
+                            <span class="text-stone-300 text-xl sm:text-3xl">☠</span>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                        </div>
+                        <span class="absolute -bottom-1 -right-1 bg-stone-900 text-stone-400 border border-stone-700 text-[9px] sm:text-[10px] px-1 py-0.5 rounded-full font-cinzel">✟</span>
+                    </div>
+                    <!-- Shop Details -->
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between xs:justify-start space-x-2">
+                            <h1 class="text-lg sm:text-2xl font-bold font-cinzel text-stone-100 tracking-wider truncate">Inarich Store</h1>
+                            <button onclick="toggleAdminModal(true)" class="xs:hidden gothic-btn-black text-[10px] px-2.5 py-1.5 rounded-lg flex items-center space-x-1 border border-stone-700 shrink-0">
+                                <i class="fa-solid fa-cross text-[10px] text-stone-400"></i>
+                                <span class="font-cinzel">แอดมิน</span>
+                            </button>
+                        </div>
+                        <p id="shopDescriptionText" class="text-[11px] sm:text-xs text-stone-400 mt-0.5 font-light truncate">ร้านค้าสไตล์ Dark Gothic & Vintage Collection</p>
+                        <!-- Badges / Tags -->
+                        <div class="flex flex-wrap gap-1 mt-2">
+                            <span id="shopStatusBadge" class="inline-flex items-center text-[9px] sm:text-[10px] bg-stone-900 text-stone-300 border border-stone-800 px-2 py-0.5 rounded-full font-cinzel">
+                                <span class="w-1.5 h-1.5 rounded-full bg-stone-400 inline-block mr-1"></span>
+                                status: eternal dark open!
+                            </span>
+                            <span id="shopTagsBadge" class="text-[9px] sm:text-[10px] bg-stone-900/80 text-stone-400 border border-stone-800/80 px-2 py-0.5 rounded-full font-cinzel">
+                                gothic / dark / rare
+                            </span>
+                        </div>
+                        <!-- Contact Us Bar (Customer Front-end) -->
+                        <div class="flex items-center space-x-2 mt-2.5 pt-2 border-t border-stone-800/80">
+                            <span class="text-[10px] text-stone-500 font-cinzel tracking-wider">CONTACT:</span>
+                            <div id="custContactContainer" class="flex flex-wrap items-center gap-1.5">
+                                <!-- Dynamic Contact Icons Rendered via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Admin Button (Right Corner on Desktop) -->
+                <button onclick="toggleAdminModal(true)" class="hidden xs:flex gothic-btn-black text-xs px-3 py-2 rounded-xl items-center space-x-1.5 border border-stone-700 shrink-0">
+                    <i class="fa-solid fa-cross text-[11px] text-stone-400"></i>
+                    <span class="font-cinzel text-[11px]">แอดมิน</span>
+                </button>
+            </div>
+        </div>
+        <!-- SECTION 2: Aesthetic Gothic Banner Frame (Optimized Banner Height for Mobile) -->
+        <div id="bannerContainer" class="gothic-frame rounded-2xl p-2 sm:p-3 relative overflow-hidden group">
+            <!-- Dark Banner Artwork (Aspect Ratio 1122x495 without any text overlay) -->
+            <div class="w-full aspect-[1122/495] rounded-xl overflow-hidden border border-stone-800 relative bg-stone-900 shadow-inner group-hover:border-stone-700 transition duration-300">
+                <img id="shopBannerImg" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop"
+                     alt="Inarich Gothic Aesthetic Banner"
+                     class="w-full h-full object-cover group-hover:scale-105 transition duration-500 ease-out"
+                     onerror="this.onerror=null; this.src='https://placehold.co/1122x495/121212/e0e0e0?text=Inarich+Gothic+Banner+(1122x495)';" />
+            </div>
+        </div>
+        <!-- SECTION 3: Rating Summary Card (STANDALONE CARD 1) -->
+        <div class="gothic-frame gothic-frame-dashed rounded-2xl p-3.5 sm:p-5 relative overflow-hidden">
+            <!-- Gothic corner icons -->
+            <span class="absolute top-2 left-2 text-[9px] sm:text-[10px] text-stone-700">✟</span>
+            <span class="absolute top-2 right-2 text-[9px] sm:text-[10px] text-stone-700">☾</span>
+            <span class="absolute bottom-2 left-2 text-[9px] sm:text-[10px] text-stone-700">🕷</span>
+            <span class="absolute bottom-2 right-2 text-[9px] sm:text-[10px] text-stone-700">✟</span>
+           
+            <!-- Layout ตามรูปภาพ: ฝั่งซ้าย (กะโหลก + 4.7/5.0 + ดาว + จาก X รีวิวทั้งหมด) | ฝั่งขวา (ปุ่มเขียนรีวิว) -->
+            <div class="flex items-center justify-between gap-4">
+               
+                <!-- Left Group: Skull Icon + Rating Stack (Score, Stars, Review Count) -->
+                <div class="flex items-center space-x-3.5">
+                    <!-- Skull Icon Box -->
+                    <div class="w-14 h-14 rounded-2xl bg-stone-900 border border-stone-700/80 flex items-center justify-center text-stone-200 shrink-0 shadow-inner">
+                        <i class="fa-solid fa-skull text-2xl"></i>
+                    </div>
+                   
+                    <!-- Rating Content Stack -->
+                    <div class="flex flex-col justify-center space-y-1">
+                        <!-- 1. Rating Score Number & / 5.0 -->
+                        <div class="flex items-baseline space-x-1.5 leading-none">
+                            <span id="avgRatingScore" class="text-2xl sm:text-3xl font-bold font-cinzel text-stone-100">4.7</span>
+                            <span class="text-xs text-stone-400 font-cinzel font-medium">/ 5.0</span>
+                        </div>
+                       
+                        <!-- 2. Stars Rating -->
+                        <div id="avgStars" class="flex items-center space-x-1 text-stone-200 text-xs">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                       
+                        <!-- 3. Review Count Text Below Stars -->
+                        <div id="totalReviewsCount" class="text-[11px] sm:text-xs text-stone-400 font-cinzel tracking-wide">
+                            จาก <strong class="text-stone-300 font-semibold">3</strong> รีวิวทั้งหมด
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Group: Write Review Button -->
+                <div class="flex items-center shrink-0">
+                    <button onclick="toggleReviewModal(true)" class="gothic-btn-black group px-4 sm:px-5 py-2.5 rounded-2xl flex items-center space-x-2 text-xs sm:text-sm font-cinzel border border-stone-600 active:scale-95 transition shadow-lg">
+                        <i class="fa-solid fa-feather-pointed text-stone-300 transition-transform group-hover:rotate-12 text-xs"></i>
+                        <span class="font-bold tracking-wider text-stone-100 whitespace-nowrap">เขียนรีวิว</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- SECTION 4: Customer Reviews List Card (STANDALONE CARD 2) -->
+        <div class="gothic-frame rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-stone-800">
+                <h3 class="text-xs sm:text-sm font-bold font-cinzel text-stone-200 flex items-center space-x-2">
+                    <span>† ความคิดเห็นจากลูกค้าทั้งหมด †</span>
+                </h3>
+                <span class="text-[10px] text-stone-500 font-cinzel">CUSTOMER FEEDBACK</span>
+            </div>
+            <!-- Review Items List Container -->
+            <div id="publicReviewList" class="space-y-4">
+                <!-- Dynamically rendered via JS -->
+            </div>
+        </div>
+    </div>
+    <!-- ==================== MODALS (Optimized Touch Targets for Mobile) ==================== -->
+    <!-- 1. CUSTOMER WRITE REVIEW MODAL -->
+    <div id="reviewModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="gothic-frame rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 relative border border-stone-700 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="toggleReviewModal(false)" class="absolute top-4 right-4 text-stone-500 hover:text-stone-300 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-sm sm:text-base font-bold font-cinzel text-stone-200 mb-0.5 flex items-center space-x-2">
+                <span>† เขียนรีวิวของคุณ †</span>
+            </h3>
+            <p class="text-[11px] sm:text-xs text-stone-500 mb-4 font-cinzel">แบ่งปันความรู้สึกของคุณต่อ Inarich Store</p>
+            <form onsubmit="handleCustomerSubmitReview(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-cinzel text-stone-400 mb-1">ชื่อผู้รีวิว</label>
+                    <input type="text" id="custName" required placeholder="เช่น คุณลูกค้าน่ารัก..."
+                           class="w-full bg-stone-900 border border-stone-800 rounded-xl p-3 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-cinzel text-stone-400 mb-1">ให้คะแนนความประทับใจ</label>
+                    <div id="starRatingPicker" class="flex space-x-3 text-xl text-stone-200 cursor-pointer py-1">
+                        <i class="fa-solid fa-star p-1" onclick="setRating(1)"></i>
+                        <i class="fa-solid fa-star p-1" onclick="setRating(2)"></i>
+                        <i class="fa-solid fa-star p-1" onclick="setRating(3)"></i>
+                        <i class="fa-solid fa-star p-1" onclick="setRating(4)"></i>
+                        <i class="fa-solid fa-star p-1" onclick="setRating(5)"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-cinzel text-stone-400 mb-1">ข้อความรีวิว</label>
+                    <textarea id="custContent" rows="3" required placeholder="พิมพ์ข้อความรีวิวตรงนี้..."
+                              class="w-full bg-stone-900 border border-stone-800 rounded-xl p-3 text-xs text-stone-200 focus:outline-none focus:border-stone-600"></textarea>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="toggleReviewModal(false)" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl text-xs text-stone-400 border border-stone-800 font-cinzel">ยกเลิก</button>
+                    <button type="submit" id="btnSubmitReview" class="flex-1 sm:flex-initial gothic-btn-black px-5 py-2.5 rounded-xl text-xs font-cinzel font-bold border border-stone-700">ส่งรีวิว</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 2. ADMIN LOGIN MODAL (เชื่อมต่อ Supabase Auth จริง) -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="gothic-frame rounded-2xl max-w-sm w-full p-5 sm:p-6 relative border border-stone-700 shadow-2xl">
+            <button onclick="toggleAdminLoginModal(false)" class="absolute top-4 right-4 text-stone-500 hover:text-stone-300 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-sm sm:text-base font-bold font-cinzel text-stone-200 mb-1 flex items-center space-x-2">
+                <i class="fa-solid fa-lock text-stone-400 text-xs"></i>
+                <span>† เข้าสู่ระบบผู้ดูแล (Admin Login) †</span>
+            </h3>
+            <p class="text-[11px] text-stone-500 mb-4 font-cinzel">ยืนยันตัวตนด้วยบัญชีแอดมิน Supabase</p>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-cinzel text-stone-400 mb-1">อีเมลแอดมิน (Email)</label>
+                    <input type="email" id="adminLoginEmail" required placeholder="admin@example.com"
+                           class="w-full bg-stone-900 border border-stone-800 rounded-xl p-3 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-cinzel text-stone-400 mb-1">รหัสผ่าน (Password)</label>
+                    <input type="password" id="adminLoginPassword" required placeholder="••••••••"
+                           class="w-full bg-stone-900 border border-stone-800 rounded-xl p-3 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="toggleAdminLoginModal(false)" class="flex-1 px-4 py-2.5 rounded-xl text-xs text-stone-400 border border-stone-800 font-cinzel">ยกเลิก</button>
+                    <button type="submit" id="btnAdminLogin" class="flex-1 gothic-btn-black px-5 py-2.5 rounded-xl text-xs font-cinzel font-bold border border-stone-700">เข้าสู่ระบบ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 3. ADMIN CONTROL MODAL (Optimized for Mobile Screens) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="gothic-frame rounded-t-2xl sm:rounded-2xl max-w-2xl w-full p-4 sm:p-6 relative border border-stone-700 shadow-2xl max-h-[92vh] flex flex-col">
+           
+            <div class="flex items-center justify-between pb-3 border-b border-stone-800">
+                <div>
+                    <h3 class="text-xs sm:text-base font-bold font-cinzel text-stone-200 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-user-shield text-stone-400 text-xs sm:text-sm"></i>
+                        <span>แผงจัดการหลังบ้าน (Admin Console)</span>
+                    </h3>
+                    <p class="text-[10px] sm:text-xs text-stone-500 mt-0.5">จัดการรูปภาพ และสถานะรีวิว (อนุมัติ / ซ่อน / ลบ)</p>
+                </div>
+                <button onclick="toggleAdminModal(false)" class="text-stone-500 hover:text-stone-300 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <!-- Scrollable Content Area -->
+            <div class="overflow-y-auto flex-1 my-4 space-y-5 pr-1">
+               
+                <!-- SECTION: Manage Shop Images (Logo & Banner) -->
+                <div class="bg-stone-900/90 border border-stone-800 rounded-xl p-4 space-y-4">
+                    <h4 class="text-xs font-bold font-cinzel text-stone-300 flex items-center space-x-1.5 border-b border-stone-800 pb-2">
+                        <i class="fa-solid fa-image text-stone-400"></i>
+                        <span>จัดการรูปภาพและรายละเอียดร้านค้า</span>
+                    </h4>
+                    <!-- Edit Shop Info Form -->
+                    <div class="space-y-2 border-b border-stone-800 pb-3">
+                        <label class="block text-xs font-cinzel text-stone-400">แก้ไขข้อมูลรายละเอียดร้าน</label>
+                        <div class="space-y-2">
+                            <div>
+                                <span class="text-[10px] text-stone-500 font-cinzel">คำอธิบายร้านค้า:</span>
+                                <input type="text" id="adminDescInput" placeholder="คำอธิบายร้านค้า..."
+                                       class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <span class="text-[10px] text-stone-500 font-cinzel">ข้อความป้ายสถานะ (Status):</span>
+                                    <input type="text" id="adminStatusInput" placeholder=" status: eternal dark open!"
+                                           class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-stone-500 font-cinzel">ข้อความป้ายแท็ก (Tags):</span>
+                                    <input type="text" id="adminTagsInput" placeholder="gothic / dark / rare"
+                                           class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                                </div>
+                            </div>
+                            <button id="btnSaveShopInfo" onclick="updateShopInfoFromAdmin()" class="w-full gothic-btn-black text-xs py-2 rounded-lg font-cinzel font-bold border border-stone-700">
+                                บันทึกการแก้ไขข้อมูลร้านค้า
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Logo Setting -->
+                        <div class="space-y-2">
+                            <label class="block text-xs text-stone-400 font-cinzel">เปลี่ยนรูปโลโก้ร้าน</label>
+                            <div class="space-y-2">
+                                <label class="w-full flex items-center justify-center space-x-2 bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-stone-700 rounded-lg p-2 text-xs text-stone-300 cursor-pointer transition">
+                                    <i class="fa-solid fa-upload text-stone-400"></i>
+                                    <span id="logoUploadLabel">อัปโหลดรูปโลโก้จากเครื่อง</span>
+                                    <input type="file" id="adminLogoFileInput" accept="image/*" onchange="handleLogoFileUpload(event)" class="hidden">
+                                </label>
+                                <div class="flex space-x-2">
+                                    <input type="text" id="adminLogoInput" placeholder="หรือวาง URL รูปโลโก้..."
+                                           class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                                    <button onclick="updateLogoFromAdmin()" class="gothic-btn-black text-xs px-3 py-1.5 rounded-lg font-cinzel whitespace-nowrap">บันทึก</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Banner Setting -->
+                        <div class="space-y-2">
+                            <label class="block text-xs text-stone-400 font-cinzel">จัดการรูปแบรนเนอร์</label>
+                            <div id="adminBannerControl">
+                                <!-- Banner buttons dynamically rendered -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- SECTION: Manage Contact Us Links -->
+                <div class="bg-stone-900/90 border border-stone-800 rounded-xl p-4 space-y-3">
+                    <h4 class="text-xs font-bold font-cinzel text-stone-300 flex items-center justify-between border-b border-stone-800 pb-2">
+                        <span class="flex items-center space-x-1.5">
+                            <i class="fa-solid fa-address-book text-stone-400"></i>
+                            <span>จัดการช่องทางติดต่อ (Contact Us)</span>
+                        </span>
+                    </h4>
+                    <!-- Dynamic List of Admin Contact Inputs -->
+                    <div id="adminContactList" class="space-y-2.5">
+                        <!-- Dynamic Contact Rows Rendered via JS -->
+                    </div>
+                    <!-- Add New Custom Contact Channel Form -->
+                    <div class="pt-2 border-t border-stone-800/80">
+                        <label class="block text-[11px] text-stone-400 font-cinzel mb-1 shadow-sm">เพิ่มช่องทางติดต่อใหม่:</label>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                            <select id="newContactPlatform" class="bg-stone-950 border border-stone-800 text-stone-300 text-xs rounded-lg p-2 focus:outline-none focus:border-stone-600 font-cinzel">
+                                <option value="facebook">Facebook</option>
+                                <option value="line">Line</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="twitter">X (Twitter)</option>
+                                <option value="shopee">Shopee</option>
+                                <option value="lazada">Lazada</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="phone">เบอร์โทรศัพท์ (Phone)</option>
+                                <option value="email">อีเมล (Email)</option>
+                                <option value="telegram">Telegram</option>
+                                <option value="discord">Discord</option>
+                                <option value="other">อื่นๆ (Link)</option>
+                            </select>
+                            <input type="text" id="newContactUrl" placeholder="ใส่ลิงก์ หรือข้อมูลติดต่อ..." class="flex-1 bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                            <button id="btnAddContact" onclick="addContactChannel()" class="gothic-btn-black text-xs px-3 py-2 rounded-lg font-cinzel whitespace-nowrap border border-stone-700">
+                                + เพิ่มช่องทาง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- SECTION: Manage Reviews List -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold font-cinzel text-stone-300 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-list-check text-stone-400"></i>
+                        <span>รายการรีวิวทั้งหมด</span>
+                    </h4>
+                    <div id="adminReviewList" class="space-y-3">
+                        <!-- Admin Items dynamically rendered -->
+                    </div>
+                </div>
+
+                <!-- SECTION: Change Admin Password (Connected to Supabase Auth) -->
+                <div class="bg-stone-900/90 border border-stone-800 rounded-xl p-4 space-y-3">
+                    <h4 class="text-xs font-bold font-cinzel text-stone-300 flex items-center space-x-1.5 border-b border-stone-800 pb-2">
+                        <i class="fa-solid fa-key text-stone-400"></i>
+                        <span>เปลี่ยนรหัสผ่านแอดมิน (Change Admin Password)</span>
+                    </h4>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="block text-[11px] text-stone-400 font-cinzel mb-1">รหัสผ่านปัจจุบัน (Current Password):</label>
+                            <input type="password" id="adminCurrentPass" placeholder="กรอกรหัสผ่านปัจจุบัน..."
+                                   class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-stone-400 font-cinzel mb-1">รหัสผ่านใหม่ (New Password):</label>
+                            <input type="password" id="adminNewPass" placeholder="กรอกรหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)..."
+                                   class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-stone-400 font-cinzel mb-1">ยืนยันรหัสผ่านใหม่ (Confirm New Password):</label>
+                            <input type="password" id="adminConfirmPass" placeholder="ยืนยันรหัสผ่านใหม่..."
+                                   class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                        </div>
+                        <button id="btnChangePass" onclick="handleChangeAdminPassword()" class="w-full gothic-btn-black text-xs py-2 rounded-lg font-cinzel font-bold border border-stone-700">
+                            อัปเดตรหัสผ่านแอดมิน
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="pt-3 border-t border-stone-800 flex justify-between items-center text-xs text-stone-500">
+                <span id="adminUserEmailDisplay">สิทธิ์ผู้ดูแลระบบ: Inarich Admin</span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="handleAdminLogout()" class="px-3 py-2 rounded-xl text-xs font-cinzel bg-red-950/70 hover:bg-red-900 text-red-300 border border-red-900/70 transition">ออกจากระบบ</button>
+                    <button onclick="toggleAdminModal(false)" class="gothic-btn-black px-4 py-2 rounded-xl text-xs font-cinzel">ปิดหน้าต่าง</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== JAVASCRIPT LOGIC (SUPABASE CONNECTED) ==================== -->
+    <script>
+        // 1. ตั้งค่าการเชื่อมต่อ Supabase
+        const SUPABASE_URL = 'https://vpxkkreclgqofxipazjl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_MROjzNBH0AbC8Ps5tWD1Pg_oet4xGlW';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // สถานะข้อมูลหลัก (โหลดจาก Supabase จริง)
+        let bannerUrl = null;
+        let logoUrl = null;
+        let shopDesc = "ร้านค้าสไตล์ Dark Gothic & Vintage Collection";
+        let shopStatusText = "status: eternal dark open!";
+        let shopTagsText = "gothic / dark / rare";
+        let contactLinks = [];
+        let reviews = [];
+        let selectedRating = 5;
+        let currentAdminUser = null;
+        let isSubmitting = false;
+
+        // Platform metadata dictionary
+        const platformMeta = {
+            facebook: { label: 'Facebook', icon: 'fa-brands fa-facebook-f' },
+            line: { label: 'Line', icon: 'fa-brands fa-line' },
+            instagram: { label: 'Instagram', icon: 'fa-brands fa-instagram' },
+            tiktok: { label: 'TikTok', icon: 'fa-brands fa-tiktok' },
+            twitter: { label: 'X (Twitter)', icon: 'fa-brands fa-x-twitter' },
+            shopee: { label: 'Shopee', icon: 'fa-solid fa-bag-shopping' },
+            lazada: { label: 'Lazada', icon: 'fa-solid fa-store' },
+            youtube: { label: 'YouTube', icon: 'fa-brands fa-youtube' },
+            phone: { label: 'Phone', icon: 'fa-solid fa-phone' },
+            email: { label: 'Email', icon: 'fa-solid fa-envelope' },
+            telegram: { label: 'Telegram', icon: 'fa-brands fa-telegram' },
+            discord: { label: 'Discord', icon: 'fa-brands fa-discord' },
+            other: { label: 'Link', icon: 'fa-solid fa-link' }
+        };
+
+        // เริ่มต้นทำงานเมื่อโหลดหน้าเว็บ
+        window.onload = async function() {
+            initFallingCrosses();
+            await checkAuthSession();
+            await loadAllDataFromSupabase();
+        };
+
+        // โหลดข้อมูลทั้งหมดจาก Supabase
+        async function loadAllDataFromSupabase() {
+            try {
+                // แสดงสถานะกำลังโหลด
+                document.getElementById('publicReviewList').innerHTML = `
+                    <div class="p-8 text-center text-stone-500 text-xs font-cinzel animate-pulse">
+                        <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> กำลังโหลดข้อมูลจากฐานข้อมูล...
+                    </div>
+                `;
+
+                // โหลดข้อมูลพร้อมกันทั้ง 3 ตาราง
+                const [settingsRes, contactsRes, reviewsRes] = await Promise.all([
+                    supabaseClient.from('shop_settings').select('*').eq('id', 1).maybeSingle(),
+                    supabaseClient.from('contact_links').select('*').order('id', { ascending: true }),
+                    supabaseClient.from('reviews').select('*').order('created_at', { ascending: false })
+                ]);
+
+                if (settingsRes.error) throw settingsRes.error;
+                if (contactsRes.error) throw contactsRes.error;
+                if (reviewsRes.error) throw reviewsRes.error;
+
+                // 1. อัปเดตข้อมูลร้านค้า (shop_settings)
+                if (settingsRes.data) {
+                    const s = settingsRes.data;
+                    shopDesc = s.shop_desc || shopDesc;
+                    shopStatusText = s.shop_status_text || shopStatusText;
+                    shopTagsText = s.shop_tags_text || shopTagsText;
+                    logoUrl = s.logo_url || null;
+                    bannerUrl = s.banner_url || null;
+
+                    document.getElementById('shopDescriptionText').innerText = shopDesc;
+                    document.getElementById('shopStatusBadge').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-stone-400 inline-block mr-1"></span> ${escapeHtml(shopStatusText)}`;
+                    document.getElementById('shopTagsBadge').innerText = shopTagsText;
+                    renderShopLogoUI();
+                    renderAdminBannerControls();
+                    initAdminShopInfoInputs();
+                }
+
+                // 2. อัปเดตช่องทางติดต่อ (contact_links)
+                contactLinks = contactsRes.data || [];
+                renderContactLinksUI();
+
+                // 3. อัปเดตรีวิว (reviews)
+                reviews = reviewsRes.data || [];
+                renderPublicReviews();
+                renderAdminReviews();
+                updateStats();
+
+            } catch (err) {
+                console.error('Load data error:', err);
+                showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณารีเฟรชหน้าเว็บ');
+                document.getElementById('publicReviewList').innerHTML = `
+                    <div class="p-6 text-center text-red-400 text-xs font-cinzel">
+                        † ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบอินเทอร์เน็ต †
+                    </div>
+                `;
+            }
+        }
+
+        // --- ระบบตรวจสอบสิทธิ์และล็อกอินแอดมิน ---
+        async function checkAuthSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                const isAdmin = await verifyAdminRole(session.user.id);
+                if (isAdmin) {
+                    currentAdminUser = session.user;
+                    document.getElementById('adminUserEmailDisplay').innerText = `แอดมิน: ${session.user.email}`;
+                } else {
+                    await supabaseClient.auth.signOut();
+                    currentAdminUser = null;
+                }
+            }
+        }
+
+        async function verifyAdminRole(userId) {
+            const { data, error } = await supabaseClient
+                .from('admin_users')
+                .select('user_id')
+                .eq('user_id', userId)
+                .maybeSingle();
+            return !error && !!data;
+        }
+
+        async function toggleAdminModal(show) {
+            if (!show) {
+                document.getElementById('adminModal').classList.add('hidden');
+                return;
+            }
+            // เช็กสิทธิ์ก่อนเปิดหน้าต่างแอดมิน
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                const isAdmin = await verifyAdminRole(session.user.id);
+                if (isAdmin) {
+                    currentAdminUser = session.user;
+                    document.getElementById('adminUserEmailDisplay').innerText = `แอดมิน: ${session.user.email}`;
+                    document.getElementById('adminModal').classList.remove('hidden');
+                    await loadAllDataFromSupabase(); // โหลดข้อมูลล่าสุดเสมอเมื่อเปิดแอดมิน
+                    return;
+                }
+            }
+            // ถ้ายังไม่ล็อกอิน ให้เปิดหน้าต่างล็อกอินแอดมิน
+            toggleAdminLoginModal(true);
+        }
+
+        function toggleAdminLoginModal(show) {
+            document.getElementById('adminLoginModal').classList.toggle('hidden', !show);
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            if (isSubmitting) return;
+
+            const email = document.getElementById('adminLoginEmail').value.trim();
+            const password = document.getElementById('adminLoginPassword').value;
+            const btn = document.getElementById('btnAdminLogin');
+
+            isSubmitting = true;
+            btn.disabled = true;
+            btn.innerText = 'กำลังตรวจสอบ...';
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+
+                const isAdmin = await verifyAdminRole(data.user.id);
+                if (!isAdmin) {
+                    await supabaseClient.auth.signOut();
+                    throw new Error('บัญชีนี้ไม่มีสิทธิ์ผู้ดูแลระบบ (Admin)');
+                }
+
+                currentAdminUser = data.user;
+                document.getElementById('adminUserEmailDisplay').innerText = `แอดมิน: ${data.user.email}`;
+                document.getElementById('adminLoginPassword').value = '';
+                toggleAdminLoginModal(false);
+                document.getElementById('adminModal').classList.remove('hidden');
+                showToast('เข้าสู่ระบบแอดมินสำเร็จ');
+                await loadAllDataFromSupabase();
+
+            } catch (err) {
+                showToast(err.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+            } finally {
+                isSubmitting = false;
+                btn.disabled = false;
+                btn.innerText = 'เข้าสู่ระบบ';
+            }
+        }
+
+        async function handleAdminLogout() {
+            await supabaseClient.auth.signOut();
+            currentAdminUser = null;
+            toggleAdminModal(false);
+            showToast('ออกจากระบบแอดมินเรียบร้อยแล้ว');
+            await loadAllDataFromSupabase();
+        }
+
+        // --- SHOP DETAILS MANAGEMENT ---
+        function initAdminShopInfoInputs() {
+            document.getElementById('adminDescInput').value = shopDesc;
+            document.getElementById('adminStatusInput').value = shopStatusText;
+            document.getElementById('adminTagsInput').value = shopTagsText;
+            document.getElementById('adminLogoInput').value = logoUrl || '';
+        }
+
+        async function updateShopInfoFromAdmin() {
+            if (isSubmitting) return;
+            const desc = document.getElementById('adminDescInput').value.trim();
+            const status = document.getElementById('adminStatusInput').value.trim();
+            const tags = document.getElementById('adminTagsInput').value.trim();
+            const btn = document.getElementById('btnSaveShopInfo');
+
+            isSubmitting = true;
+            btn.disabled = true;
+            btn.innerText = 'กำลังบันทึก...';
+
+            try {
+                const updates = {
+                    shop_desc: desc || shopDesc,
+                    shop_status_text: status || shopStatusText,
+                    shop_tags_text: tags || shopTagsText,
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error } = await supabaseClient
+                    .from('shop_settings')
+                    .update(updates)
+                    .eq('id', 1);
+
+                if (error) throw error;
+
+                shopDesc = updates.shop_desc;
+                shopStatusText = updates.shop_status_text;
+                shopTagsText = updates.shop_tags_text;
+
+                document.getElementById('shopDescriptionText').innerText = shopDesc;
+                document.getElementById('shopStatusBadge').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-stone-400 inline-block mr-1"></span> ${escapeHtml(shopStatusText)}`;
+                document.getElementById('shopTagsBadge').innerText = shopTagsText;
+                showToast('บันทึกข้อมูลร้านค้าลงฐานข้อมูลเรียบร้อยแล้ว');
+            } catch (err) {
+                showToast('บันทึกไม่สำเร็จ: ' + err.message);
+            } finally {
+                isSubmitting = false;
+                btn.disabled = false;
+                btn.innerText = 'บันทึกการแก้ไขข้อมูลร้านค้า';
+            }
+        }
+
+        // --- ADMIN PASSWORD MANAGEMENT (SUPABASE AUTH) ---
+        async function handleChangeAdminPassword() {
+            if (isSubmitting) return;
+            const currentPass = document.getElementById('adminCurrentPass').value;
+            const newPass = document.getElementById('adminNewPass').value;
+            const confirmPass = document.getElementById('adminConfirmPass').value;
+            const btn = document.getElementById('btnChangePass');
+
+            if (!currentPass || !newPass || !confirmPass) {
+                showToast('กรุณากรอกข้อมูลรหัสผ่านให้ครบทุกช่อง');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                showToast('รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน');
+                return;
+            }
+            if (newPass.length < 6) {
+                showToast('รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+                return;
+            }
+
+            isSubmitting = true;
+            btn.disabled = true;
+            btn.innerText = 'กำลังอัปเดตรหัสผ่าน...';
+
+            try {
+                // ยืนยันรหัสผ่านเดิมก่อนเพื่อความปลอดภัย
+                const { error: verifyError } = await supabaseClient.auth.signInWithPassword({
+                    email: currentAdminUser.email,
+                    password: currentPass
+                });
+                if (verifyError) throw new Error('รหัสผ่านปัจจุบันไม่ถูกต้อง');
+
+                // อัปเดตรหัสผ่านใหม่ขึ้น Supabase Auth
+                const { error: updateError } = await supabaseClient.auth.updateUser({
+                    password: newPass
+                });
+                if (updateError) throw updateError;
+
+                document.getElementById('adminCurrentPass').value = '';
+                document.getElementById('adminNewPass').value = '';
+                document.getElementById('adminConfirmPass').value = '';
+                showToast('เปลี่ยนรหัสผ่านแอดมินในระบบจริงสำเร็จแล้ว!');
+            } catch (err) {
+                showToast(err.message || 'ไม่สามารถเปลี่ยนรหัสผ่านได้');
+            } finally {
+                isSubmitting = false;
+                btn.disabled = false;
+                btn.innerText = 'อัปเดตรหัสผ่านแอดมิน';
+            }
+        }
+
+        // --- DYNAMIC CONTACT LINKS MANAGEMENT ---
+        function renderContactLinksUI() {
+            const custContainer = document.getElementById('custContactContainer');
+            if (contactLinks.length === 0) {
+                custContainer.innerHTML = `<span class="text-[10px] text-stone-600 font-cinzel">- ไม่มีช่องทางติดต่อ -</span>`;
+            } else {
+                custContainer.innerHTML = contactLinks.map(item => `
+                    <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener"
+                       class="w-6 h-6 rounded-full bg-stone-900 border border-stone-800 hover:border-stone-600 flex items-center justify-center text-stone-400 hover:text-stone-200 transition text-[11px]"
+                       title="${escapeHtml(item.label)}">
+                        <i class="${escapeHtml(item.icon)}"></i>
+                    </a>
+                `).join('');
+            }
+
+            const adminContainer = document.getElementById('adminContactList');
+            if (contactLinks.length === 0) {
+                adminContainer.innerHTML = `<div class="text-[11px] text-stone-500 text-center py-2">ยังไม่มีช่องทางติดต่อในระบบ</div>`;
+            } else {
+                adminContainer.innerHTML = contactLinks.map(item => `
+                    <div class="flex items-center space-x-2 bg-stone-950/60 p-2 rounded-lg border border-stone-800/80">
+                        <span class="w-24 text-[11px] font-cinzel text-stone-300 flex items-center space-x-1.5 truncate">
+                            <i class="${escapeHtml(item.icon)} text-stone-400 w-4"></i>
+                            <span class="truncate">${escapeHtml(item.label)}</span>
+                        </span>
+                        <input type="text" value="${escapeHtml(item.url)}" onchange="updateContactUrl(${item.id}, this.value)"
+                               placeholder="ลิงก์ติดต่อ..."
+                               class="flex-1 bg-stone-950 border border-stone-800 rounded-lg p-1.5 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                        <button onclick="removeContactChannel(${item.id})" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900/60 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-trash text-[10px]"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function updateContactUrl(id, newUrl) {
+            const cleanUrl = newUrl.trim() || '#';
+            try {
+                const { error } = await supabaseClient
+                    .from('contact_links')
+                    .update({ url: cleanUrl })
+                    .eq('id', id);
+                if (error) throw error;
+
+                const item = contactLinks.find(c => c.id === id);
+                if (item) {
+                    item.url = cleanUrl;
+                    renderContactLinksUI();
+                    showToast(`อัปเดตลิงก์ ${item.label} เรียบร้อยแล้ว`);
+                }
+            } catch (err) {
+                showToast('อัปเดตลิงก์ไม่สำเร็จ: ' + err.message);
+            }
+        }
+
+        async function addContactChannel() {
+            if (isSubmitting) return;
+            const platformKey = document.getElementById('newContactPlatform').value;
+            const urlInput = document.getElementById('newContactUrl').value.trim();
+            if (!urlInput) {
+                showToast('กรุณากรอกลิงก์ หรือข้อมูลช่องทางติดต่อ');
+                return;
+            }
+
+            const btn = document.getElementById('btnAddContact');
+            isSubmitting = true;
+            btn.disabled = true;
+
+            try {
+                const meta = platformMeta[platformKey] || platformMeta['other'];
+                const { data, error } = await supabaseClient
+                    .from('contact_links')
+                    .insert([{
+                        platform: platformKey,
+                        label: meta.label,
+                        url: urlInput,
+                        icon: meta.icon
+                    }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                contactLinks.push(data);
+                document.getElementById('newContactUrl').value = '';
+                renderContactLinksUI();
+                showToast(`เพิ่มช่องทาง ${meta.label} เรียบร้อยแล้ว`);
+            } catch (err) {
+                showToast('เพิ่มช่องทางไม่สำเร็จ: ' + err.message);
+            } finally {
+                isSubmitting = false;
+                btn.disabled = false;
+            }
+        }
+
+        async function removeContactChannel(id) {
+            try {
+                const { error } = await supabaseClient
+                    .from('contact_links')
+                    .delete()
+                    .eq('id', id);
+                if (error) throw error;
+
+                contactLinks = contactLinks.filter(c => c.id !== id);
+                renderContactLinksUI();
+                showToast('ลบช่องทางติดต่อเรียบร้อยแล้ว');
+            } catch (err) {
+                showToast('ลบช่องทางไม่สำเร็จ: ' + err.message);
+            }
+        }
+
+        // --- ADMIN IMAGE & STORAGE MANAGEMENT ---
+        function renderShopLogoUI() {
+            const avatarContainer = document.getElementById('shopLogoContainer');
+            if (logoUrl) {
+                avatarContainer.innerHTML = `<img src="${escapeHtml(logoUrl)}" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'text-stone-300 text-xl sm:text-3xl\\'>☠</span>';" />`;
+            } else {
+                avatarContainer.innerHTML = `
+                    <span class="text-stone-300 text-xl sm:text-3xl">☠</span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                `;
+            }
+        }
+
+        async function uploadImageToStorage(file, prefix) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${prefix}_${Date.now()}.${fileExt}`;
+            const { error: uploadError } = await supabaseClient.storage
+                .from('shop-assets')
+                .upload(fileName, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data } = supabaseClient.storage
+                .from('shop-assets')
+                .getPublicUrl(fileName);
+
+            return data.publicUrl;
+        }
+
+        async function handleLogoFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const label = document.getElementById('logoUploadLabel');
+            label.innerText = 'กำลังอัปโหลด...';
+
+            try {
+                const publicUrl = await uploadImageToStorage(file, 'logo');
+                const { error } = await supabaseClient
+                    .from('shop_settings')
+                    .update({ logo_url: publicUrl, updated_at: new Date().toISOString() })
+                    .eq('id', 1);
+                if (error) throw error;
+
+                logoUrl = publicUrl;
+                document.getElementById('adminLogoInput').value = publicUrl;
+                renderShopLogoUI();
+                showToast('อัปโหลดและบันทึกรูปโลโก้เรียบร้อยแล้ว');
+            } catch (err) {
+                showToast('อัปโหลดโลโก้ไม่สำเร็จ: ' + err.message);
+            } finally {
+                label.innerText = 'อัปโหลดรูปโลโก้จากเครื่อง';
+                event.target.value = '';
+            }
+        }
+
+        async function updateLogoFromAdmin() {
+            const url = document.getElementById('adminLogoInput').value.trim();
+            try {
+                const { error } = await supabaseClient
+                    .from('shop_settings')
+                    .update({ logo_url: url || null, updated_at: new Date().toISOString() })
+                    .eq('id', 1);
+                if (error) throw error;
+
+                logoUrl = url || null;
+                renderShopLogoUI();
+                showToast('อัปเดตรูปโลโก้ร้านค้าเรียบร้อย');
+            } catch (err) {
+                showToast('อัปเดตโลโก้ไม่สำเร็จ: ' + err.message);
+            }
+        }
+
+        async function handleBannerFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            showToast('กำลังอัปโหลดแบรนเนอร์...');
+
+            try {
+                const publicUrl = await uploadImageToStorage(file, 'banner');
+                const { error } = await supabaseClient
+                    .from('shop_settings')
+                    .update({ banner_url: publicUrl, updated_at: new Date().toISOString() })
+                    .eq('id', 1);
+                if (error) throw error;
+
+                bannerUrl = publicUrl;
+                renderAdminBannerControls();
+                showToast('อัปโหลดและบันทึกรูปแบรนเนอร์เรียบร้อยแล้ว');
+            } catch (err) {
+                showToast('อัปโหลดแบรนเนอร์ไม่สำเร็จ: ' + err.message);
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        function renderAdminBannerControls() {
+            const container = document.getElementById('adminBannerControl');
+            const bannerContainer = document.getElementById('bannerContainer');
+            const bannerImg = document.getElementById('shopBannerImg');
+            if (bannerUrl) {
+                bannerContainer.classList.remove('hidden');
+                bannerImg.src = bannerUrl;
+                container.innerHTML = `
+                    <div class="space-y-2">
+                        <label class="w-full flex items-center justify-center space-x-2 bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-stone-700 rounded-lg p-2 text-xs text-stone-300 cursor-pointer transition">
+                            <i class="fa-solid fa-upload text-stone-400"></i>
+                            <span>อัปโหลดแบรนเนอร์ใหม่จากเครื่อง</span>
+                            <input type="file" id="adminBannerFileInput" accept="image/*" onchange="handleBannerFileUpload(event)" class="hidden">
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="adminBannerInput" value="${escapeHtml(bannerUrl)}" placeholder="หรือวาง URL รูปแบรนเนอร์..."
+                                   class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-stone-600">
+                            <button onclick="updateBannerUrlFromInput()" class="gothic-btn-black text-xs px-3 py-1.5 rounded-lg font-cinzel whitespace-nowrap">แก้ไข</button>
+                        </div>
+                        <button onclick="removeBanner()" class="w-full px-3 py-1.5 bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-900 rounded-lg text-xs font-cinzel transition flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-trash text-[10px]"></i>
+                            <span>ลบรูปแบรนเนอร์ออก</span>
+                        </button>
+                    </div>
+                `;
+            } else {
+                bannerContainer.classList.add('hidden');
+                container.innerHTML = `
+                    <div class="space-y-2">
+                        <label class="w-full flex items-center justify-center space-x-2 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 rounded-lg p-2.5 text-xs font-cinzel cursor-pointer transition">
+                            <i class="fa-solid fa-upload text-[10px]"></i>
+                            <span>+ อัปโหลดรูปแบรนเนอร์จากเครื่อง</span>
+                            <input type="file" id="adminBannerFileInput" accept="image/*" onchange="handleBannerFileUpload(event)" class="hidden">
+                        </label>
+                    </div>
+                `;
+            }
+        }
+
+        async function updateBannerUrlFromInput() {
+            const inputVal = document.getElementById('adminBannerInput').value.trim();
+            if (!inputVal) {
+                await removeBanner();
+                return;
+            }
+            try {
+                const { error } = await supabaseClient
+                    .from('shop_settings')
+                    .update({ banner_url: inputVal, updated_at: new Date().toISOString() })
+                    .eq('id', 1);
+                if (error) throw error;
+
+                bannerUrl = inputVal;
+                renderAdminBannerControls();
+                showToast('อัปเดตรูปแบรนเนอร์เรียบร้อย');
+            } catch (err) {
+                showToast('อัปเดตแบรนเนอร์ไม่สำเร็จ: ' + err.message);
+            }
+        }
+
+        async function removeBanner() {
+            try {
+                const { error } = await supabaseClient
+                    .from('shop_settings')
+                    .update({ banner_url: null, updated_at: new Date().toISOString() })
+                    .eq('id', 1);
+                if (error) throw error;
+
+                bannerUrl = null;
+                renderAdminBannerControls();
+                showToast('ลบรูปแบรนเนอร์ออกจากหน้าลูกค้าเรียบร้อย');
+            } catch (err) {
+                showToast('ลบแบรนเนอร์ไม่สำเร็จ: ' + err.message);
+            }
+        }
+
+        function initFallingCrosses() {
+            const symbols = ['†', '✟', '☠', '☾', '✟', '†'];
+            const containerCount = 18;
+            for (let i = 0; i < containerCount; i++) {
+                const cross = document.createElement('div');
+                cross.className = 'falling-cross font-cinzel';
+                cross.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                cross.style.left = `${Math.random() * 98}vw`;
+                cross.style.animationDuration = `${8 + Math.random() * 10}s`;
+                cross.style.animationDelay = `${Math.random() * 10}s`;
+                cross.style.fontSize = `${12 + Math.random() * 12}px`;
+                cross.style.opacity = `${0.15 + Math.random() * 0.3}`;
+                document.body.appendChild(cross);
+            }
+        }
+
+        function renderPublicReviews() {
+            const listContainer = document.getElementById('publicReviewList');
+            const visibleReviews = reviews.filter(r => r.status === 'approved');
+            if (visibleReviews.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="p-8 text-center text-stone-500 text-xs font-cinzel">
+                        † ยังไม่มีรีวิวในขณะนี้ †
+                    </div>
+                `;
+                return;
+            }
+            listContainer.innerHTML = visibleReviews.map(r => `
+                <div class="bg-stone-900/60 border border-stone-800/90 rounded-xl p-4 hover:border-stone-700 transition duration-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-stone-800 text-stone-400 text-[10px] flex items-center justify-center font-cinzel">†</span>
+                            <span class="font-bold text-xs sm:text-sm text-stone-200">${escapeHtml(r.name)}</span>
+                        </div>
+                        <span class="text-[10px] sm:text-[11px] text-stone-500 font-cinzel">${escapeHtml(r.review_date)}</span>
+                    </div>
+                    <div class="flex items-center space-x-1 text-stone-300 text-[11px] mb-2 pl-8">
+                        ${generateStarsHtml(r.rating)}
+                    </div>
+                    <div class="pl-8 text-xs sm:text-sm text-stone-300 font-light leading-relaxed bg-stone-950/40 p-3 rounded-lg border border-stone-800/40">
+                        ${escapeHtml(r.content)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminReviews() {
+            const adminContainer = document.getElementById('adminReviewList');
+            if (reviews.length === 0) {
+                adminContainer.innerHTML = `<div class="text-center py-6 text-stone-500 text-xs">ไม่มีรีวิวในระบบ</div>`;
+                return;
+            }
+            adminContainer.innerHTML = reviews.map(r => {
+                let statusBadge = '';
+                if (r.status === 'approved') {
+                    statusBadge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] px-2 py-0.5 rounded-full">อนุมัติแล้ว</span>`;
+                } else if (r.status === 'pending') {
+                    statusBadge = `<span class="bg-amber-950 text-amber-400 border border-amber-800 text-[10px] px-2 py-0.5 rounded-full">รออนุมัติ</span>`;
+                } else if (r.status === 'hidden') {
+                    statusBadge = `<span class="bg-stone-900 text-stone-500 border border-stone-800 text-[10px] px-2 py-0.5 rounded-full">ซ่อนอยู่</span>`;
+                }
+                return `
+                    <div class="bg-stone-900/90 border border-stone-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-stone-200">${escapeHtml(r.name)}</span>
+                                ${statusBadge}
+                                <span class="text-[10px] text-stone-500">(${escapeHtml(r.review_date)})</span>
+                            </div>
+                            <div class="flex items-center space-x-1 text-stone-400 text-xs">
+                                ${generateStarsHtml(r.rating)}
+                            </div>
+                            <p class="text-xs text-stone-300 mt-1">${escapeHtml(r.content)}</p>
+                        </div>
+                        <div class="flex items-center space-x-1.5 self-end sm:self-center">
+                            ${r.status !== 'approved' ? `
+                                <button onclick="changeReviewStatus(${r.id}, 'approved')" class="px-2.5 py-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 rounded-lg text-xs font-cinzel transition">
+                                    <i class="fa-solid fa-check text-[10px] mr-1"></i>อนุมัติ
+                                </button>
+                            ` : ''}
+                            ${r.status !== 'hidden' ? `
+                                <button onclick="changeReviewStatus(${r.id}, 'hidden')" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded-lg text-xs font-cinzel transition">
+                                    <i class="fa-solid fa-eye-slash text-[10px] mr-1"></i>ซ่อน
+                                </button>
+                            ` : `
+                                <button onclick="changeReviewStatus(${r.id}, 'approved')" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded-lg text-xs font-cinzel transition">
+                                    <i class="fa-solid fa-eye text-[10px] mr-1"></i>เลิกซ่อน
+                                </button>
+                            `}
+                            <button onclick="deleteReview(${r.id})" class="px-2.5 py-1 bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-900 rounded-lg text-xs font-cinzel transition">
+                                <i class="fa-solid fa-trash text-[10px] mr-1"></i>ลบ
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function handleCustomerSubmitReview(e) {
+            e.preventDefault();
+            if (isSubmitting) return;
+
+            const name = document.getElementById('custName').value.trim();
+            const content = document.getElementById('custContent').value.trim();
+            if (!name || !content) return;
+
+            const btn = document.getElementById('btnSubmitReview');
+            isSubmitting = true;
+            btn.disabled = true;
+            btn.innerText = 'กำลังส่งรีวิว...';
+
+            try {
+                const today = new Date();
+                const dateStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear() + 543}`;
+
+                const { error } = await supabaseClient
+                    .from('reviews')
+                    .insert([{
+                        name: name,
+                        review_date: dateStr,
+                        rating: selectedRating,
+                        content: content,
+                        status: 'pending'
+                    }]);
+
+                if (error) throw error;
+
+                document.getElementById('custName').value = '';
+                document.getElementById('custContent').value = '';
+                toggleReviewModal(false);
+                showToast('ส่งรีวิวเรียบร้อยแล้ว! (รอแอดมินอนุมัติเพื่อแสดงผล)');
+
+                // หากแอดมินล็อกอินค้างไว้ ให้รีเฟรชรายการในหน้าแอดมินด้วย
+                if (currentAdminUser) {
+                    await loadAllDataFromSupabase();
+                }
+            } catch (err) {
+                showToast('ส่งรีวิวไม่สำเร็จ: ' + err.message);
+            } finally {
+                isSubmitting = false;
+                btn.disabled = false;
+                btn.innerText = 'ส่งรีวิว';
+            }
+        }
+
+        async function changeReviewStatus(id, newStatus) {
+            try {
+                const { error } = await supabaseClient
+                    .from('reviews')
+                    .update({ status: newStatus })
+                    .eq('id', id);
+                if (error) throw error;
+
+                const r = reviews.find(item => item.id === id);
+                if (r) {
+                    r.status = newStatus;
+                    renderPublicReviews();
+                    renderAdminReviews();
+                    updateStats();
+                    showToast(`อัปเดตสถานะเป็น: ${newStatus === 'approved' ? 'อนุมัติแล้ว' : 'ซ่อนแล้ว'}`);
+                }
+            } catch (err) {
+                showToast('เปลี่ยนสถานะไม่สำเร็จ: ' + err.message);
+            }
+        }
+
+        async function deleteReview(id) {
+            try {
+                const { error } = await supabaseClient
+                    .from('reviews')
+                    .delete()
+                    .eq('id', id);
+                if (error) throw error;
+
+                reviews = reviews.filter(item => item.id !== id);
+                renderPublicReviews();
+                renderAdminReviews();
+                updateStats();
+                showToast('ลบรีวิวออกจากระบบแล้ว');
+            } catch (err) {
+                showToast('ลบรีวิวไม่สำเร็จ: ' + err.message);
+            }
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.querySelectorAll('#starRatingPicker i');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('text-stone-600');
+                    star.classList.add('text-stone-200');
+                } else {
+                    star.classList.remove('text-stone-200');
+                    star.classList.add('text-stone-600');
+                }
+            });
+        }
+
+        function updateStats() {
+            const approved = reviews.filter(r => r.status === 'approved');
+            const totalCount = approved.length;
+           
+            document.getElementById('totalReviewsCount').innerHTML = `
+                จาก <strong class="text-stone-300 font-semibold">${totalCount}</strong> รีวิวทั้งหมด
+            `;
+           
+            if (totalCount === 0) {
+                document.getElementById('avgRatingScore').innerText = '0.0';
+                document.getElementById('avgStars').innerHTML = generateStarsHtml(0);
+                return;
+            }
+            const avg = (approved.reduce((acc, curr) => acc + curr.rating, 0) / totalCount).toFixed(1);
+            document.getElementById('avgRatingScore').innerText = avg;
+            const avgNum = parseFloat(avg);
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(avgNum)) {
+                    starsHtml += `<i class="fa-solid fa-star"></i>`;
+                } else if (i - 0.5 <= avgNum) {
+                    starsHtml += `<i class="fa-solid fa-star-half-stroke"></i>`;
+                } else {
+                    starsHtml += `<i class="fa-regular fa-star text-stone-700"></i>`;
+                }
+            }
+            document.getElementById('avgStars').innerHTML = starsHtml;
+        }
+
+        function generateStarsHtml(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    html += `<i class="fa-solid fa-star"></i>`;
+                } else {
+                    html += `<i class="fa-regular fa-star text-stone-700"></i>`;
+                }
+            }
+            return html;
+        }
+
+        function toggleReviewModal(show) {
+            document.getElementById('reviewModal').classList.toggle('hidden', !show);
+            if (show) setRating(5);
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 bg-stone-900 text-stone-200 border border-stone-700 px-4 py-3 rounded-xl shadow-2xl z-50 text-xs font-cinzel animate-bounce';
+            toast.innerText = `† ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
